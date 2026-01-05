@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Reward System - Space Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1247 50%, #2d1b69 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(2px 2px at 20% 30%, white, transparent),
+                radial-gradient(2px 2px at 60% 70%, white, transparent),
+                radial-gradient(1px 1px at 50% 50%, white, transparent),
+                radial-gradient(1px 1px at 80% 10%, white, transparent),
+                radial-gradient(2px 2px at 90% 60%, white, transparent),
+                radial-gradient(1px 1px at 33% 80%, white, transparent),
+                radial-gradient(1px 1px at 15% 85%, white, transparent);
+            background-size: 200% 200%;
+            background-position: 0% 0%;
+            animation: stars 200s linear infinite;
+            pointer-events: none;
+            opacity: 0.8;
+            z-index: 0;
+        }
+
+        @keyframes stars {
+            from { background-position: 0% 0%; }
+            to { background-position: 100% 100%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #00d4ff, 0 0 40px #00d4ff;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #00d4ff;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .add-project-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            color: #00d4ff;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.4);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #00d4ff 0%, #0066ff 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 100, 255, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .project-card {
+            background: linear-gradient(135deg, rgba(42, 21, 105, 0.6) 0%, rgba(21, 10, 52, 0.6) 100%);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s;
+        }
+
+        .project-card:hover {
+            border-color: rgba(0, 212, 255, 0.6);
+            box-shadow: 0 12px 40px rgba(0, 212, 255, 0.3);
+        }
+
+        .project-card.completed {
+            background: linear-gradient(135deg, rgba(0, 212, 127, 0.3) 0%, rgba(0, 100, 60, 0.3) 100%);
+            border-color: rgba(0, 255, 127, 0.5);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .project-title {
+            color: #fff;
+            font-size: 1.8em;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .reward-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            color: #1a1247;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.95em;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .reward-badge.earned {
+            background: linear-gradient(135deg, #00ff7f 0%, #00d46a 100%);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .progress-section {
+            margin-bottom: 20px;
+        }
+
+        .progress-text {
+            color: #00d4ff;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff 0%, #0066ff 100%);
+            transition: width 0.3s;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+        }
+
+        .task-input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .task-input-section input {
+            flex: 1;
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.4);
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            background: rgba(0, 255, 127, 0.1);
+        }
+
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #00d4ff;
+        }
+
+        .task-text {
+            flex: 1;
+            color: #fff;
+            font-size: 1.05em;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+
+        .task-text:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .task-text-input {
+            flex: 1;
+            padding: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid #00d4ff;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 1.05em;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+        }
+
+        .task-menu-btn {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            font-size: 1.2em;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .task-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .task-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 5px;
+            background: rgba(30, 20, 60, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 8px;
+            padding: 5px;
+            min-width: 150px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .task-menu button {
+            width: 100%;
+            padding: 10px 15px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            text-align: left;
+            font-size: 0.95em;
+            border-radius: 5px;
+            margin-bottom: 2px;
+            box-shadow: none;
+        }
+
+        .task-menu button:hover {
+            background: rgba(0, 212, 255, 0.2);
+            transform: none;
+        }
+
+        .task-menu button:last-child {
+            color: #ff6b6b;
+            margin-bottom: 0;
+        }
+
+        .task-menu button:last-child:hover {
+            background: rgba(255, 50, 50, 0.2);
+        }
+
+        .delete-project-btn {
+            padding: 8px 20px;
+            background: rgba(255, 50, 50, 0.3);
+            border: 1px solid rgba(255, 50, 50, 0.5);
+            margin-top: 15px;
+        }
+
+        .delete-project-btn:hover {
+            background: rgba(255, 50, 50, 0.5);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            padding: 40px;
+            font-size: 1.1em;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(42, 21, 105, 0.95) 0%, rgba(21, 10, 52, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            border: 2px solid #00d4ff;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.5);
+            animation: slideIn 0.4s;
+        }
+
+        @keyframes slideIn {
+            from { 
+                transform: scale(0.8) translateY(-50px);
+                opacity: 0;
+            }
+            to { 
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h2 {
+            color: #00d4ff;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.8);
+        }
+
+        .modal-content p {
+            color: #fff;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .modal-reward {
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            color: #1a1247;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 25px 0;
+            display: inline-block;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+        }
+
+        .modal-content button {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+
+        .project-card.collapsed {
+            padding: 20px 25px;
+            cursor: pointer;
+        }
+
+        .project-card.collapsed:hover {
+            background: linear-gradient(135deg, rgba(0, 212, 127, 0.4) 0%, rgba(0, 100, 60, 0.4) 100%);
+        }
+
+        .project-card.collapsed .project-header {
+            margin-bottom: 0;
+        }
+
+        .project-card.collapsed .progress-section,
+        .project-card.collapsed .task-input-section,
+        .project-card.collapsed .task-list,
+        .project-card.collapsed .delete-project-btn {
+            display: none;
+        }
+
+        .expand-hint {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9em;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .project-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .task-input-section {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 TASK REWARD SYSTEM 🌌</h1>
+        <p class="subtitle">Complete missions, unlock rewards across the galaxy</p>
+
+        <div class="add-project-section">
+            <div class="input-group">
+                <label for="projectName">Mission Name</label>
+                <input type="text" id="projectName" placeholder="e.g., Launch New Website">
+            </div>
+            <div class="input-group">
+                <label for="projectReward">Mission Reward</label>
+                <input type="text" id="projectReward" placeholder="e.g., Weekend Getaway">
+            </div>
+            <button onclick="addProject()">Create Mission</button>
+        </div>
+
+        <div id="projectsContainer"></div>
+    </div>
+
+    <script>
+        let projects = [];
+        let openMenuId = null;
+
+        function loadProjects() {
+            const saved = localStorage.getItem('spaceProjects');
+            if (saved) {
+                projects = JSON.parse(saved);
+                renderProjects();
+            }
+        }
+
+        function saveProjects() {
+            localStorage.setItem('spaceProjects', JSON.stringify(projects));
+        }
+
+        function addProject() {
+            const name = document.getElementById('projectName').value.trim();
+            const reward = document.getElementById('projectReward').value.trim();
+
+            if (!name || !reward) {
+                alert('Please enter both mission name and reward!');
+                return;
+            }
+
+            const project = {
+                id: Date.now(),
+                name: name,
+                reward: reward,
+                tasks: [],
+                collapsed: false
+            };
+
+            projects.push(project);
+            saveProjects();
+            renderProjects();
+
+            document.getElementById('projectName').value = '';
+            document.getElementById('projectReward').value = '';
+        }
+
+        function addTask(projectId) {
+            const input = document.getElementById(`taskInput-${projectId}`);
+            const taskText = input.value.trim();
+
+            if (!taskText) {
+                alert('Please enter a task!');
+                return;
+            }
+
+            const project = projects.find(p => p.id === projectId);
+            if (project) {
+                project.tasks.push({
+                    id: Date.now(),
+                    text: taskText,
+                    completed: false
+                });
+                saveProjects();
+                renderProjects();
+                input.value = '';
+            }
+        }
+
+        function toggleTask(projectId, taskId) {
+            const project = projects.find(p => p.id === projectId);
+            if (project) {
+                const task = project.tasks.find(t => t.id === taskId);
+                if (task) {
+                    const wasCompleted = task.completed;
+                    task.completed = !task.completed;
+                    saveProjects();
+                    renderProjects();
+
+                    // Check if all tasks are now completed
+                    if (!wasCompleted && task.completed) {
+                        const allCompleted = project.tasks.every(t => t.completed);
+                        if (allCompleted && project.tasks.length > 0) {
+                            showCompletionModal(project);
+                        }
+                    }
+                }
+            }
+        }
+
+        function showCompletionModal(project) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h2>🎉 MISSION COMPLETE! 🎉</h2>
+                    <p>Congratulations on completing</p>
+                    <p style="font-size: 1.4em; color: #00d4ff;"><strong>${project.name}</strong></p>
+                    <div class="modal-reward">🎁 ${project.reward}</div>
+                    <p>You've earned your reward!</p>
+                    <button onclick="closeModal()">Continue</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            // Set project to collapsed after showing modal
+            setTimeout(() => {
+                const proj = projects.find(p => p.id === project.id);
+                if (proj) {
+                    proj.collapsed = true;
+                    saveProjects();
+                }
+            }, 100);
+        }
+
+        function closeModal() {
+            const modal = document.querySelector('.modal-overlay');
+            if (modal) {
+                modal.remove();
+                renderProjects();
+            }
+        }
+
+        function toggleProjectCollapse(projectId, event) {
+            // Don't toggle if clicking on buttons or inputs
+            if (event.target.tagName === 'BUTTON' || 
+                event.target.tagName === 'INPUT' ||
+                event.target.closest('button') ||
+                event.target.closest('.task-menu')) {
+                return;
+            }
+
+            const project = projects.find(p => p.id === projectId);
+            if (project && project.collapsed) {
+                project.collapsed = false;
+                saveProjects();
+                renderProjects();
+            }
+        }
+
+        function editTaskText(projectId, taskId, element) {
+            const project = projects.find(p => p.id === projectId);
+            const task = project.tasks.find(t => t.id === taskId);
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'task-text-input';
+            input.value = task.text;
+            
+            const parent = element.parentElement;
+            parent.replaceChild(input, element);
+            input.focus();
+            input.select();
+
+            function saveEdit() {
+                const newText = input.value.trim();
+                if (newText) {
+                    task.text = newText;
+                    saveProjects();
+                }
+                renderProjects();
+            }
+
+            input.addEventListener('blur', saveEdit);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    saveEdit();
+                }
+            });
+        }
+
+        function toggleTaskMenu(taskId, event) {
+            event.stopPropagation();
+            
+            // Close existing menu
+            if (openMenuId === taskId) {
+                openMenuId = null;
+                renderProjects();
+                return;
+            }
+
+            openMenuId = taskId;
+            renderProjects();
+        }
+
+        function moveTaskUp(projectId, taskId) {
+            const project = projects.find(p => p.id === projectId);
+            const taskIndex = project.tasks.findIndex(t => t.id === taskId);
+            
+            if (taskIndex > 0) {
+                [project.tasks[taskIndex], project.tasks[taskIndex - 1]] = 
+                [project.tasks[taskIndex - 1], project.tasks[taskIndex]];
+                saveProjects();
+                renderProjects();
+            }
+        }
+
+        function moveTaskDown(projectId, taskId) {
+            const project = projects.find(p => p.id === projectId);
+            const taskIndex = project.tasks.findIndex(t => t.id === taskId);
+            
+            if (taskIndex < project.tasks.length - 1) {
+                [project.tasks[taskIndex], project.tasks[taskIndex + 1]] = 
+                [project.tasks[taskIndex + 1], project.tasks[taskIndex]];
+                saveProjects();
+                renderProjects();
+            }
+        }
+
+        function deleteTask(projectId, taskId) {
+            const project = projects.find(p => p.id === projectId);
+            if (project) {
+                project.tasks = project.tasks.filter(t => t.id !== taskId);
+                saveProjects();
+                renderProjects();
+            }
+        }
+
+        function deleteProject(projectId) {
+            if (confirm('Are you sure you want to delete this mission and all its tasks?')) {
+                projects = projects.filter(p => p.id !== projectId);
+                saveProjects();
+                renderProjects();
+            }
+        }
+
+        function renderProjects() {
+            const container = document.getElementById('projectsContainer');
+            
+            if (projects.length === 0) {
+                container.innerHTML = '<div class="empty-state">No missions yet. Create your first mission above! 🌟</div>';
+                return;
+            }
+
+            container.innerHTML = projects.map(project => {
+                const completedTasks = project.tasks.filter(t => t.completed).length;
+                const totalTasks = project.tasks.length;
+                const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+                const isCompleted = totalTasks > 0 && completedTasks === totalTasks;
+
+                return `
+                    <div class="project-card ${isCompleted ? 'completed' : ''} ${project.collapsed ? 'collapsed' : ''}" 
+                         onclick="toggleProjectCollapse(${project.id}, event)">
+                        <div class="project-header">
+                            <h2 class="project-title">${project.name}</h2>
+                            <div class="reward-badge ${isCompleted ? 'earned' : ''}">
+                                ${isCompleted ? '🎉 ' : '🎁 '}${project.reward}
+                            </div>
+                        </div>
+
+                        ${project.collapsed ? '<p class="expand-hint">Click to expand and view tasks</p>' : ''}
+
+                        <div class="progress-section">
+                            <div class="progress-text">
+                                Mission Progress: ${completedTasks} / ${totalTasks} tasks completed
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="task-input-section">
+                            <input type="text" id="taskInput-${project.id}" placeholder="Add a new task..." 
+                                   onkeypress="if(event.key === 'Enter') addTask(${project.id})">
+                            <button onclick="addTask(${project.id})">Add Task</button>
+                        </div>
+
+                        <ul class="task-list">
+                            ${project.tasks.map(task => `
+                                <li class="task-item ${task.completed ? 'completed' : ''}">
+                                    <input type="checkbox" class="task-checkbox" 
+                                           ${task.completed ? 'checked' : ''} 
+                                           onchange="toggleTask(${project.id}, ${task.id})">
+                                    <span class="task-text" onclick="editTaskText(${project.id}, ${task.id}, this)">${task.text}</span>
+                                    <div style="position: relative;">
+                                        <button class="task-menu-btn" onclick="toggleTaskMenu(${task.id}, event)">⋮</button>
+                                        ${openMenuId === task.id ? `
+                                            <div class="task-menu">
+                                                <button onclick="moveTaskUp(${project.id}, ${task.id}); event.stopPropagation();">↑ Move Up</button>
+                                                <button onclick="moveTaskDown(${project.id}, ${task.id}); event.stopPropagation();">↓ Move Down</button>
+                                                <button onclick="deleteTask(${project.id}, ${task.id}); event.stopPropagation();">🗑️ Delete</button>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                </li>
+                            `).join('')}
+                        </ul>
+
+                        <button class="delete-project-btn" onclick="deleteProject(${project.id}); event.stopPropagation();">
+                            Delete Mission
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (openMenuId !== null && !e.target.closest('.task-menu-btn')) {
+                openMenuId = null;
+                renderProjects();
+            }
+        });
+
+        // Load projects on page load
+        loadProjects();
+    </script>
+</body>
+</html>
