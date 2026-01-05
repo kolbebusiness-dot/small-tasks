@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Task Reward System</title>
+    <title>Task Reward System - Space Edition</title>
     <link rel="apple-touch-icon" href="icon.jpg">
     <style>
         * {
@@ -171,6 +171,25 @@
             color: #fff;
             font-size: 1.8em;
             text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            display: inline-block;
+        }
+
+        .project-title:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .project-title-input {
+            color: #fff;
+            font-size: 1.8em;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-weight: inherit;
         }
 
         .reward-badge {
@@ -181,11 +200,31 @@
             font-weight: bold;
             font-size: 0.95em;
             box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .reward-badge:hover {
+            background: linear-gradient(135deg, #ffe44d 0%, #ffbb33 100%);
         }
 
         .reward-badge.earned {
             background: linear-gradient(135deg, #00ff7f 0%, #00d46a 100%);
             animation: pulse 2s infinite;
+        }
+
+        .reward-badge.earned:hover {
+            background: linear-gradient(135deg, #33ff99 0%, #00e67a 100%);
+        }
+
+        .reward-input {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a1247;
+            padding: 8px 20px;
+            border: 2px solid #ffd700;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.95em;
         }
 
         @keyframes pulse {
@@ -482,7 +521,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🚀 DAILY TASK REWARD SYSTEM 🌌</h1>
+        <h1>🚀 TASK REWARD SYSTEM 🌌</h1>
         <p class="subtitle">Complete missions, unlock rewards across the galaxy</p>
 
         <div class="add-project-section">
@@ -665,6 +704,66 @@
             });
         }
 
+        function editProjectName(projectId, element, event) {
+            event.stopPropagation();
+            const project = projects.find(p => p.id === projectId);
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'project-title-input';
+            input.value = project.name;
+            
+            element.replaceWith(input);
+            input.focus();
+            input.select();
+
+            function saveEdit() {
+                const newName = input.value.trim();
+                if (newName) {
+                    project.name = newName;
+                    saveProjects();
+                }
+                renderProjects();
+            }
+
+            input.addEventListener('blur', saveEdit);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    saveEdit();
+                }
+            });
+        }
+
+        function editProjectReward(projectId, element, event) {
+            event.stopPropagation();
+            const project = projects.find(p => p.id === projectId);
+            
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'reward-input';
+            input.value = project.reward;
+            
+            element.replaceWith(input);
+            input.focus();
+            input.select();
+
+            function saveEdit() {
+                const newReward = input.value.trim();
+                if (newReward) {
+                    project.reward = newReward;
+                    saveProjects();
+                }
+                renderProjects();
+            }
+
+            input.addEventListener('blur', saveEdit);
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    saveEdit();
+                }
+            });
+        }
+
         function toggleTaskMenu(taskId, event) {
             event.stopPropagation();
             
@@ -738,8 +837,8 @@
                     <div class="project-card ${isCompleted ? 'completed' : ''} ${project.collapsed ? 'collapsed' : ''}" 
                          onclick="toggleProjectCollapse(${project.id}, event)">
                         <div class="project-header">
-                            <h2 class="project-title">${project.name}</h2>
-                            <div class="reward-badge ${isCompleted ? 'earned' : ''}">
+                            <h2 class="project-title" onclick="editProjectName(${project.id}, this, event)">${project.name}</h2>
+                            <div class="reward-badge ${isCompleted ? 'earned' : ''}" onclick="editProjectReward(${project.id}, this, event)">
                                 ${isCompleted ? '🎉 ' : '🎁 '}${project.reward}
                             </div>
                         </div>
