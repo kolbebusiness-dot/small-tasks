@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Reward System - Space Edition</title>
-    <link rel="apple-touch-icon" href="icon.jpg">
     <style>
         * {
             margin: 0;
@@ -570,33 +569,6 @@
             font-style: italic;
         }
 
-        .collapse-hint {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9em;
-            margin-top: 10px;
-            text-align: center;
-            font-style: italic;
-        }
-
-        .collapse-toggle-btn {
-            width: 100%;
-            padding: 10px;
-            background: rgba(0, 212, 255, 0.2);
-            border: 1px solid rgba(0, 212, 255, 0.4);
-            border-radius: 8px;
-            color: #00d4ff;
-            font-size: 0.95em;
-            font-weight: bold;
-            margin-top: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .collapse-toggle-btn:hover {
-            background: rgba(0, 212, 255, 0.3);
-            border-color: rgba(0, 212, 255, 0.6);
-        }
-
         @media (max-width: 768px) {
             h1 {
                 font-size: 2em;
@@ -823,7 +795,6 @@
             }
 
             input.addEventListener('blur', saveEdit);
-            input.addEventListener('click', (e) => e.stopPropagation());
             input.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     saveEdit();
@@ -854,7 +825,6 @@
             }
 
             input.addEventListener('blur', saveEdit);
-            input.addEventListener('click', (e) => e.stopPropagation());
             input.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     saveEdit();
@@ -968,11 +938,12 @@
                 const isCompleted = totalTasks > 0 && completedTasks === totalTasks;
 
                 return `
-                    <div class="project-card ${isCompleted ? 'completed' : ''} ${project.collapsed ? 'collapsed' : ''}">
+                    <div class="project-card ${isCompleted ? 'completed' : ''} ${project.collapsed ? 'collapsed' : ''}" 
+                         onclick="toggleProjectCollapse(${project.id}, event)">
                         <div class="project-header">
                             <div class="project-title-section">
-                                <h2 class="project-title" onclick="editProjectName(${project.id}, this, event); event.stopPropagation();">${project.name}</h2>
-                                <div class="reward-badge ${isCompleted ? 'earned' : ''}" onclick="editProjectReward(${project.id}, this, event); event.stopPropagation();">
+                                <h2 class="project-title" onclick="editProjectName(${project.id}, this, event)">${project.name}</h2>
+                                <div class="reward-badge ${isCompleted ? 'earned' : ''}" onclick="editProjectReward(${project.id}, this, event)">
                                     ${isCompleted ? '🎉 ' : '🎁 '}${project.reward}
                                 </div>
                             </div>
@@ -988,6 +959,8 @@
                             </div>
                         </div>
 
+                        ${project.collapsed ? '<p class="expand-hint">Click to expand and view tasks</p>' : ''}
+
                         <div class="progress-section">
                             <div class="progress-text">
                                 Mission Progress: ${completedTasks} / ${totalTasks} tasks completed
@@ -999,8 +972,8 @@
 
                         <div class="task-input-section">
                             <input type="text" id="taskInput-${project.id}" placeholder="Add a new task..." 
-                                   onkeypress="if(event.key === 'Enter') addTask(${project.id})" onclick="event.stopPropagation()">
-                            <button onclick="addTask(${project.id}); event.stopPropagation()">Add Task</button>
+                                   onkeypress="if(event.key === 'Enter') addTask(${project.id})">
+                            <button onclick="addTask(${project.id})">Add Task</button>
                         </div>
 
                         <ul class="task-list">
@@ -1008,8 +981,8 @@
                                 <li class="task-item ${task.completed ? 'completed' : ''}">
                                     <input type="checkbox" class="task-checkbox" 
                                            ${task.completed ? 'checked' : ''} 
-                                           onchange="toggleTask(${project.id}, ${task.id}); event.stopPropagation();">
-                                    <span class="task-text" onclick="editTaskText(${project.id}, ${task.id}, this); event.stopPropagation();">${task.text}</span>
+                                           onchange="toggleTask(${project.id}, ${task.id})">
+                                    <span class="task-text" onclick="editTaskText(${project.id}, ${task.id}, this)">${task.text}</span>
                                     <div style="position: relative;">
                                         <button class="task-menu-btn" onclick="toggleTaskMenu(${task.id}, event)">⋮</button>
                                         ${openMenuId === task.id ? `
@@ -1023,10 +996,6 @@
                                 </li>
                             `).join('')}
                         </ul>
-
-                        <button class="collapse-toggle-btn" onclick="toggleProjectCollapse(${project.id}, event); event.stopPropagation();">
-                            ${project.collapsed ? '▼ Expand' : '▲ Collapse'}
-                        </button>
                     </div>
                 `;
             }).join('');
