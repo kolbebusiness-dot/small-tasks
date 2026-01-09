@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Reward System - Space Edition</title>
-    <link rel="apple-touch-icon" href="icon.jpg">
     <style>
         * {
             margin: 0;
@@ -163,8 +162,79 @@
         .project-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-bottom: 20px;
+            position: relative;
+        }
+
+        .project-title-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-right: 15px;
+        }
+
+        .project-menu-container {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+        .project-menu-btn {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            font-size: 1.4em;
+            cursor: pointer;
+            border-radius: 8px;
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+        .project-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .project-menu {
+            position: absolute;
+            right: 0;
+            top: 45px;
+            background: rgba(30, 20, 60, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 8px;
+            padding: 5px;
+            min-width: 150px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .project-menu button {
+            width: 100%;
+            padding: 10px 15px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            text-align: left;
+            font-size: 0.95em;
+            border-radius: 5px;
+            margin-bottom: 2px;
+            box-shadow: none;
+        }
+
+        .project-menu button:hover {
+            background: rgba(0, 212, 255, 0.2);
+            transform: none;
+        }
+
+        .project-menu button:last-child {
+            color: #ff6b6b;
+            margin-bottom: 0;
+        }
+
+        .project-menu button:last-child:hover {
+            background: rgba(255, 50, 50, 0.2);
         }
 
         .project-title {
@@ -388,10 +458,7 @@
             background: rgba(255, 50, 50, 0.3);
             border: 1px solid rgba(255, 50, 50, 0.5);
             margin-top: 15px;
-        }
-
-        .delete-project-btn:hover {
-            background: rgba(255, 50, 50, 0.5);
+            display: none;
         }
 
         .empty-state {
@@ -502,6 +569,33 @@
             font-style: italic;
         }
 
+        .collapse-hint {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9em;
+            margin-top: 10px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .collapse-toggle-btn {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid rgba(0, 212, 255, 0.4);
+            border-radius: 8px;
+            color: #00d4ff;
+            font-size: 0.95em;
+            font-weight: bold;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .collapse-toggle-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: rgba(0, 212, 255, 0.6);
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 2em;
@@ -542,6 +636,7 @@
     <script>
         let projects = [];
         let openMenuId = null;
+        let openProjectMenuId = null;
 
         function loadProjects() {
             const saved = localStorage.getItem('spaceProjects');
@@ -727,6 +822,7 @@
             }
 
             input.addEventListener('blur', saveEdit);
+            input.addEventListener('click', (e) => e.stopPropagation());
             input.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     saveEdit();
@@ -757,6 +853,7 @@
             }
 
             input.addEventListener('blur', saveEdit);
+            input.addEventListener('click', (e) => e.stopPropagation());
             input.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     saveEdit();
@@ -776,6 +873,42 @@
 
             openMenuId = taskId;
             renderProjects();
+        }
+
+        function toggleProjectMenu(projectId, event) {
+            event.stopPropagation();
+            
+            // Close existing menu
+            if (openProjectMenuId === projectId) {
+                openProjectMenuId = null;
+                renderProjects();
+                return;
+            }
+
+            openProjectMenuId = projectId;
+            renderProjects();
+        }
+
+        function moveProjectUp(projectId) {
+            const projectIndex = projects.findIndex(p => p.id === projectId);
+            
+            if (projectIndex > 0) {
+                [projects[projectIndex], projects[projectIndex - 1]] = 
+                [projects[projectIndex - 1], projects[projectIndex]];
+                saveProjects();
+                renderProjects();
+            }
+        }
+
+        function moveProjectDown(projectId) {
+            const projectIndex = projects.findIndex(p => p.id === projectId);
+            
+            if (projectIndex < projects.length - 1) {
+                [projects[projectIndex], projects[projectIndex + 1]] = 
+                [projects[projectIndex + 1], projects[projectIndex]];
+                saveProjects();
+                renderProjects();
+            }
         }
 
         function moveTaskUp(projectId, taskId) {
@@ -834,16 +967,25 @@
                 const isCompleted = totalTasks > 0 && completedTasks === totalTasks;
 
                 return `
-                    <div class="project-card ${isCompleted ? 'completed' : ''} ${project.collapsed ? 'collapsed' : ''}" 
-                         onclick="toggleProjectCollapse(${project.id}, event)">
+                    <div class="project-card ${isCompleted ? 'completed' : ''} ${project.collapsed ? 'collapsed' : ''}">
                         <div class="project-header">
-                            <h2 class="project-title" onclick="editProjectName(${project.id}, this, event)">${project.name}</h2>
-                            <div class="reward-badge ${isCompleted ? 'earned' : ''}" onclick="editProjectReward(${project.id}, this, event)">
-                                ${isCompleted ? '🎉 ' : '🎁 '}${project.reward}
+                            <div class="project-title-section">
+                                <h2 class="project-title" onclick="editProjectName(${project.id}, this, event); event.stopPropagation();">${project.name}</h2>
+                                <div class="reward-badge ${isCompleted ? 'earned' : ''}" onclick="editProjectReward(${project.id}, this, event); event.stopPropagation();">
+                                    ${isCompleted ? '🎉 ' : '🎁 '}${project.reward}
+                                </div>
+                            </div>
+                            <div class="project-menu-container">
+                                <button class="project-menu-btn" onclick="toggleProjectMenu(${project.id}, event)">⋮</button>
+                                ${openProjectMenuId === project.id ? `
+                                    <div class="project-menu">
+                                        <button onclick="moveProjectUp(${project.id}); event.stopPropagation();">↑ Move Up</button>
+                                        <button onclick="moveProjectDown(${project.id}); event.stopPropagation();">↓ Move Down</button>
+                                        <button onclick="deleteProject(${project.id}); event.stopPropagation();">🗑️ Delete</button>
+                                    </div>
+                                ` : ''}
                             </div>
                         </div>
-
-                        ${project.collapsed ? '<p class="expand-hint">Click to expand and view tasks</p>' : ''}
 
                         <div class="progress-section">
                             <div class="progress-text">
@@ -856,8 +998,8 @@
 
                         <div class="task-input-section">
                             <input type="text" id="taskInput-${project.id}" placeholder="Add a new task..." 
-                                   onkeypress="if(event.key === 'Enter') addTask(${project.id})">
-                            <button onclick="addTask(${project.id})">Add Task</button>
+                                   onkeypress="if(event.key === 'Enter') addTask(${project.id})" onclick="event.stopPropagation()">
+                            <button onclick="addTask(${project.id}); event.stopPropagation()">Add Task</button>
                         </div>
 
                         <ul class="task-list">
@@ -865,8 +1007,8 @@
                                 <li class="task-item ${task.completed ? 'completed' : ''}">
                                     <input type="checkbox" class="task-checkbox" 
                                            ${task.completed ? 'checked' : ''} 
-                                           onchange="toggleTask(${project.id}, ${task.id})">
-                                    <span class="task-text" onclick="editTaskText(${project.id}, ${task.id}, this)">${task.text}</span>
+                                           onchange="toggleTask(${project.id}, ${task.id}); event.stopPropagation();">
+                                    <span class="task-text" onclick="editTaskText(${project.id}, ${task.id}, this); event.stopPropagation();">${task.text}</span>
                                     <div style="position: relative;">
                                         <button class="task-menu-btn" onclick="toggleTaskMenu(${task.id}, event)">⋮</button>
                                         ${openMenuId === task.id ? `
@@ -881,8 +1023,8 @@
                             `).join('')}
                         </ul>
 
-                        <button class="delete-project-btn" onclick="deleteProject(${project.id}); event.stopPropagation();">
-                            Delete Mission
+                        <button class="collapse-toggle-btn" onclick="toggleProjectCollapse(${project.id}, event); event.stopPropagation();">
+                            ${project.collapsed ? '▼ Expand' : '▲ Collapse'}
                         </button>
                     </div>
                 `;
@@ -893,6 +1035,10 @@
         document.addEventListener('click', (e) => {
             if (openMenuId !== null && !e.target.closest('.task-menu-btn')) {
                 openMenuId = null;
+                renderProjects();
+            }
+            if (openProjectMenuId !== null && !e.target.closest('.project-menu-btn')) {
+                openProjectMenuId = null;
                 renderProjects();
             }
         });
