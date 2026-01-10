@@ -159,6 +159,12 @@
             border-color: rgba(0, 255, 127, 0.5);
         }
 
+        .project-card.collapsed .progress-section,
+        .project-card.collapsed .task-input-section,
+        .project-card.collapsed .task-list {
+            display: none;
+        }
+
         .project-header {
             display: flex;
             justify-content: space-between;
@@ -173,68 +179,6 @@
             flex-direction: column;
             gap: 10px;
             margin-right: 15px;
-        }
-
-        .project-menu-container {
-            position: absolute;
-            top: 0;
-            right: 0;
-        }
-
-        .project-menu-btn {
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            font-size: 1.4em;
-            cursor: pointer;
-            border-radius: 8px;
-            color: #fff;
-            transition: all 0.3s;
-        }
-
-        .project-menu-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .project-menu {
-            position: absolute;
-            right: 0;
-            top: 45px;
-            background: rgba(30, 20, 60, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 212, 255, 0.5);
-            border-radius: 8px;
-            padding: 5px;
-            min-width: 150px;
-            z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .project-menu button {
-            width: 100%;
-            padding: 10px 15px;
-            background: transparent;
-            border: none;
-            color: #fff;
-            text-align: left;
-            font-size: 0.95em;
-            border-radius: 5px;
-            margin-bottom: 2px;
-            box-shadow: none;
-        }
-
-        .project-menu button:hover {
-            background: rgba(0, 212, 255, 0.2);
-            transform: none;
-        }
-
-        .project-menu button:last-child {
-            color: #ff6b6b;
-            margin-bottom: 0;
-        }
-
-        .project-menu button:last-child:hover {
-            background: rgba(255, 50, 50, 0.2);
         }
 
         .project-title {
@@ -272,6 +216,7 @@
             box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
             cursor: pointer;
             transition: background 0.2s;
+            display: inline-block;
         }
 
         .reward-badge:hover {
@@ -287,6 +232,11 @@
             background: linear-gradient(135deg, #33ff99 0%, #00e67a 100%);
         }
 
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
         .reward-input {
             background: rgba(255, 255, 255, 0.9);
             color: #1a1247;
@@ -297,9 +247,81 @@
             font-size: 0.95em;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        .project-menu-container {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+        .project-menu-btn, .task-menu-btn {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            font-size: 1.4em;
+            cursor: pointer;
+            border-radius: 8px;
+            color: #fff;
+            transition: all 0.3s;
+        }
+
+        .task-menu-btn {
+            padding: 6px 12px;
+            font-size: 1.2em;
+        }
+
+        .project-menu-btn:hover, .task-menu-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .project-menu, .task-menu {
+            position: absolute;
+            right: 0;
+            top: 45px;
+            background: rgba(30, 20, 60, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.5);
+            border-radius: 8px;
+            padding: 5px;
+            min-width: 150px;
+            z-index: 10000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .task-menu {
+            top: 100%;
+            margin-top: 5px;
+        }
+
+        .project-menu-container, .task-item > div {
+            position: relative;
+            z-index: 100;
+        }
+
+        .project-menu button, .task-menu button {
+            width: 100%;
+            padding: 10px 15px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            text-align: left;
+            font-size: 0.95em;
+            border-radius: 5px;
+            margin-bottom: 2px;
+            box-shadow: none;
+        }
+
+        .project-menu button:hover, .task-menu button:hover {
+            background: rgba(0, 212, 255, 0.2);
+            transform: none;
+        }
+
+        .project-menu button:last-child, .task-menu button:last-child {
+            color: #ff6b6b;
+            margin-bottom: 0;
+        }
+
+        .project-menu button:last-child:hover, .task-menu button:last-child:hover {
+            background: rgba(255, 50, 50, 0.2);
         }
 
         .progress-section {
@@ -398,67 +420,23 @@
             text-decoration: line-through;
         }
 
-        .task-menu-btn {
-            padding: 6px 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            font-size: 1.2em;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .task-menu-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .task-menu {
-            position: absolute;
-            right: 0;
-            top: 100%;
-            margin-top: 5px;
-            background: rgba(30, 20, 60, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 212, 255, 0.5);
-            border-radius: 8px;
-            padding: 5px;
-            min-width: 150px;
-            z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .task-menu button {
+        .collapse-toggle-btn {
             width: 100%;
-            padding: 10px 15px;
-            background: transparent;
-            border: none;
-            color: #fff;
-            text-align: left;
-            font-size: 0.95em;
-            border-radius: 5px;
-            margin-bottom: 2px;
-            box-shadow: none;
-        }
-
-        .task-menu button:hover {
+            padding: 10px;
             background: rgba(0, 212, 255, 0.2);
-            transform: none;
-        }
-
-        .task-menu button:last-child {
-            color: #ff6b6b;
-            margin-bottom: 0;
-        }
-
-        .task-menu button:last-child:hover {
-            background: rgba(255, 50, 50, 0.2);
-        }
-
-        .delete-project-btn {
-            padding: 8px 20px;
-            background: rgba(255, 50, 50, 0.3);
-            border: 1px solid rgba(255, 50, 50, 0.5);
+            border: 1px solid rgba(0, 212, 255, 0.4);
+            border-radius: 8px;
+            color: #00d4ff;
+            font-size: 0.95em;
+            font-weight: bold;
             margin-top: 15px;
-            display: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .collapse-toggle-btn:hover {
+            background: rgba(0, 212, 255, 0.3);
+            border-color: rgba(0, 212, 255, 0.6);
         }
 
         .empty-state {
@@ -542,46 +520,19 @@
             margin-top: 20px;
         }
 
-        .project-card.collapsed {
-            padding: 20px 25px;
-            cursor: pointer;
-        }
-
-        .project-card.collapsed:hover {
-            background: linear-gradient(135deg, rgba(0, 212, 127, 0.4) 0%, rgba(0, 100, 60, 0.4) 100%);
-        }
-
-        .project-card.collapsed .project-header {
-            margin-bottom: 0;
-        }
-
-        .project-card.collapsed .progress-section,
-        .project-card.collapsed .task-input-section,
-        .project-card.collapsed .task-list,
-        .project-card.collapsed .delete-project-btn {
-            display: none;
-        }
-
-        .expand-hint {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9em;
-            margin-top: 10px;
-            font-style: italic;
-        }
-
         @media (max-width: 768px) {
             h1 {
-                font-size: 2em;
-            }
-            
-            .project-header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
+                font-size: 1.8em;
             }
 
             .task-input-section {
                 flex-direction: column;
+            }
+
+            .project-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
             }
         }
     </style>
@@ -632,15 +583,14 @@
                 return;
             }
 
-            const project = {
+            projects.push({
                 id: Date.now(),
-                name: name,
-                reward: reward,
+                name,
+                reward,
                 tasks: [],
                 collapsed: false
-            };
+            });
 
-            projects.push(project);
             saveProjects();
             renderProjects();
 
@@ -670,7 +620,8 @@
             }
         }
 
-        function toggleTask(projectId, taskId) {
+        function toggleTask(projectId, taskId, event) {
+            event.stopPropagation();
             const project = projects.find(p => p.id === projectId);
             if (project) {
                 const task = project.tasks.find(t => t.id === taskId);
@@ -680,7 +631,6 @@
                     saveProjects();
                     renderProjects();
 
-                    // Check if all tasks are now completed
                     if (!wasCompleted && task.completed) {
                         const allCompleted = project.tasks.every(t => t.completed);
                         if (allCompleted && project.tasks.length > 0) {
@@ -706,7 +656,6 @@
             `;
             document.body.appendChild(modal);
 
-            // Set project to collapsed after showing modal
             setTimeout(() => {
                 const proj = projects.find(p => p.id === project.id);
                 if (proj) {
@@ -724,186 +673,103 @@
             }
         }
 
-        function toggleProjectCollapse(projectId, event) {
-            // Don't toggle if clicking on buttons or inputs
-            if (event.target.tagName === 'BUTTON' || 
-                event.target.tagName === 'INPUT' ||
-                event.target.closest('button') ||
-                event.target.closest('.task-menu')) {
-                return;
-            }
-
+        function toggleProjectCollapse(projectId) {
             const project = projects.find(p => p.id === projectId);
-            if (project && project.collapsed) {
-                project.collapsed = false;
+            if (project) {
+                project.collapsed = !project.collapsed;
                 saveProjects();
                 renderProjects();
             }
         }
 
-        function editTaskText(projectId, taskId, element) {
-            const project = projects.find(p => p.id === projectId);
-            const task = project.tasks.find(t => t.id === taskId);
-            
+        function editText(element, value, onSave) {
             const input = document.createElement('input');
             input.type = 'text';
-            input.className = 'task-text-input';
-            input.value = task.text;
-            
-            const parent = element.parentElement;
-            parent.replaceChild(input, element);
-            input.focus();
-            input.select();
-
-            function saveEdit() {
-                const newText = input.value.trim();
-                if (newText) {
-                    task.text = newText;
-                    saveProjects();
-                }
-                renderProjects();
-            }
-
-            input.addEventListener('blur', saveEdit);
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    saveEdit();
-                }
-            });
-        }
-
-        function editProjectName(projectId, element, event) {
-            event.stopPropagation();
-            const project = projects.find(p => p.id === projectId);
-            
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.className = 'project-title-input';
-            input.value = project.name;
+            input.className = element.className.includes('project-title') ? 'project-title-input' : 
+                             element.className.includes('reward-badge') ? 'reward-input' : 'task-text-input';
+            input.value = value;
             
             element.replaceWith(input);
             input.focus();
             input.select();
 
-            function saveEdit() {
-                const newName = input.value.trim();
-                if (newName) {
-                    project.name = newName;
-                    saveProjects();
-                }
+            const save = () => {
+                const newText = input.value.trim();
+                if (newText) onSave(newText);
                 renderProjects();
-            }
+            };
 
-            input.addEventListener('blur', saveEdit);
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    saveEdit();
-                }
+            input.addEventListener('blur', save);
+            input.addEventListener('keypress', (e) => { if (e.key === 'Enter') save(); });
+            input.addEventListener('click', (e) => e.stopPropagation());
+        }
+
+        function editProjectName(projectId, element, event) {
+            event.stopPropagation();
+            const project = projects.find(p => p.id === projectId);
+            editText(element, project.name, (newName) => {
+                project.name = newName;
+                saveProjects();
             });
         }
 
         function editProjectReward(projectId, element, event) {
             event.stopPropagation();
             const project = projects.find(p => p.id === projectId);
-            
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.className = 'reward-input';
-            input.value = project.reward;
-            
-            element.replaceWith(input);
-            input.focus();
-            input.select();
-
-            function saveEdit() {
-                const newReward = input.value.trim();
-                if (newReward) {
-                    project.reward = newReward;
-                    saveProjects();
-                }
-                renderProjects();
-            }
-
-            input.addEventListener('blur', saveEdit);
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    saveEdit();
-                }
+            editText(element, project.reward, (newReward) => {
+                project.reward = newReward;
+                saveProjects();
             });
         }
 
-        function toggleTaskMenu(taskId, event) {
+        function editTaskText(projectId, taskId, element, event) {
             event.stopPropagation();
-            
-            // Close existing menu
-            if (openMenuId === taskId) {
-                openMenuId = null;
-                renderProjects();
-                return;
-            }
+            const project = projects.find(p => p.id === projectId);
+            const task = project.tasks.find(t => t.id === taskId);
+            editText(element, task.text, (newText) => {
+                task.text = newText;
+                saveProjects();
+            });
+        }
 
-            openMenuId = taskId;
+        function toggleMenu(menuId, isProject = false) {
+            if (isProject) {
+                openProjectMenuId = openProjectMenuId === menuId ? null : menuId;
+            } else {
+                openMenuId = openMenuId === menuId ? null : menuId;
+            }
             renderProjects();
         }
 
-        function toggleProjectMenu(projectId, event) {
-            event.stopPropagation();
-            
-            // Close existing menu
-            if (openProjectMenuId === projectId) {
-                openProjectMenuId = null;
+        function moveItem(array, index, direction) {
+            const newIndex = index + direction;
+            if (newIndex >= 0 && newIndex < array.length) {
+                [array[index], array[newIndex]] = [array[newIndex], array[index]];
+                saveProjects();
                 renderProjects();
-                return;
             }
-
-            openProjectMenuId = projectId;
-            renderProjects();
         }
 
         function moveProjectUp(projectId) {
-            const projectIndex = projects.findIndex(p => p.id === projectId);
-            
-            if (projectIndex > 0) {
-                [projects[projectIndex], projects[projectIndex - 1]] = 
-                [projects[projectIndex - 1], projects[projectIndex]];
-                saveProjects();
-                renderProjects();
-            }
+            const index = projects.findIndex(p => p.id === projectId);
+            moveItem(projects, index, -1);
         }
 
         function moveProjectDown(projectId) {
-            const projectIndex = projects.findIndex(p => p.id === projectId);
-            
-            if (projectIndex < projects.length - 1) {
-                [projects[projectIndex], projects[projectIndex + 1]] = 
-                [projects[projectIndex + 1], projects[projectIndex]];
-                saveProjects();
-                renderProjects();
-            }
+            const index = projects.findIndex(p => p.id === projectId);
+            moveItem(projects, index, 1);
         }
 
         function moveTaskUp(projectId, taskId) {
             const project = projects.find(p => p.id === projectId);
-            const taskIndex = project.tasks.findIndex(t => t.id === taskId);
-            
-            if (taskIndex > 0) {
-                [project.tasks[taskIndex], project.tasks[taskIndex - 1]] = 
-                [project.tasks[taskIndex - 1], project.tasks[taskIndex]];
-                saveProjects();
-                renderProjects();
-            }
+            const index = project.tasks.findIndex(t => t.id === taskId);
+            moveItem(project.tasks, index, -1);
         }
 
         function moveTaskDown(projectId, taskId) {
             const project = projects.find(p => p.id === projectId);
-            const taskIndex = project.tasks.findIndex(t => t.id === taskId);
-            
-            if (taskIndex < project.tasks.length - 1) {
-                [project.tasks[taskIndex], project.tasks[taskIndex + 1]] = 
-                [project.tasks[taskIndex + 1], project.tasks[taskIndex]];
-                saveProjects();
-                renderProjects();
-            }
+            const index = project.tasks.findIndex(t => t.id === taskId);
+            moveItem(project.tasks, index, 1);
         }
 
         function deleteTask(projectId, taskId) {
@@ -938,8 +804,7 @@
                 const isCompleted = totalTasks > 0 && completedTasks === totalTasks;
 
                 return `
-                    <div class="project-card ${isCompleted ? 'completed' : ''} ${project.collapsed ? 'collapsed' : ''}" 
-                         onclick="toggleProjectCollapse(${project.id}, event)">
+                    <div class="project-card ${isCompleted ? 'completed' : ''} ${project.collapsed ? 'collapsed' : ''}">
                         <div class="project-header">
                             <div class="project-title-section">
                                 <h2 class="project-title" onclick="editProjectName(${project.id}, this, event)">${project.name}</h2>
@@ -948,23 +813,20 @@
                                 </div>
                             </div>
                             <div class="project-menu-container">
-                                <button class="project-menu-btn" onclick="toggleProjectMenu(${project.id}, event)">⋮</button>
+                                <button class="project-menu-btn" onclick="event.stopPropagation(); toggleMenu(${project.id}, true)">⋮</button>
                                 ${openProjectMenuId === project.id ? `
                                     <div class="project-menu">
-                                        <button onclick="moveProjectUp(${project.id}); event.stopPropagation();">↑ Move Up</button>
-                                        <button onclick="moveProjectDown(${project.id}); event.stopPropagation();">↓ Move Down</button>
-                                        <button onclick="deleteProject(${project.id}); event.stopPropagation();">🗑️ Delete</button>
+                                        <button onclick="moveProjectUp(${project.id})">↑ Move Up</button>
+                                        <button onclick="moveProjectDown(${project.id})">↓ Move Down</button>
+                                        <button onclick="toggleProjectCollapse(${project.id})">${project.collapsed ? '▼ Expand' : '▲ Collapse'}</button>
+                                        <button onclick="deleteProject(${project.id})">🗑️ Delete</button>
                                     </div>
                                 ` : ''}
                             </div>
                         </div>
 
-                        ${project.collapsed ? '<p class="expand-hint">Click to expand and view tasks</p>' : ''}
-
                         <div class="progress-section">
-                            <div class="progress-text">
-                                Mission Progress: ${completedTasks} / ${totalTasks} tasks completed
-                            </div>
+                            <div class="progress-text">Mission Progress: ${completedTasks} / ${totalTasks} tasks completed</div>
                             <div class="progress-bar">
                                 <div class="progress-fill" style="width: ${progress}%"></div>
                             </div>
@@ -972,7 +834,7 @@
 
                         <div class="task-input-section">
                             <input type="text" id="taskInput-${project.id}" placeholder="Add a new task..." 
-                                   onkeypress="if(event.key === 'Enter') addTask(${project.id})">
+                                   onkeypress="if(event.key === 'Enter') addTask(${project.id})" onclick="event.stopPropagation()">
                             <button onclick="addTask(${project.id})">Add Task</button>
                         </div>
 
@@ -981,15 +843,15 @@
                                 <li class="task-item ${task.completed ? 'completed' : ''}">
                                     <input type="checkbox" class="task-checkbox" 
                                            ${task.completed ? 'checked' : ''} 
-                                           onchange="toggleTask(${project.id}, ${task.id})">
-                                    <span class="task-text" onclick="editTaskText(${project.id}, ${task.id}, this)">${task.text}</span>
+                                           onchange="toggleTask(${project.id}, ${task.id}, event)">
+                                    <span class="task-text" onclick="editTaskText(${project.id}, ${task.id}, this, event)">${task.text}</span>
                                     <div style="position: relative;">
-                                        <button class="task-menu-btn" onclick="toggleTaskMenu(${task.id}, event)">⋮</button>
+                                        <button class="task-menu-btn" onclick="event.stopPropagation(); toggleMenu(${task.id}, false)">⋮</button>
                                         ${openMenuId === task.id ? `
                                             <div class="task-menu">
-                                                <button onclick="moveTaskUp(${project.id}, ${task.id}); event.stopPropagation();">↑ Move Up</button>
-                                                <button onclick="moveTaskDown(${project.id}, ${task.id}); event.stopPropagation();">↓ Move Down</button>
-                                                <button onclick="deleteTask(${project.id}, ${task.id}); event.stopPropagation();">🗑️ Delete</button>
+                                                <button onclick="moveTaskUp(${project.id}, ${task.id})">↑ Move Up</button>
+                                                <button onclick="moveTaskDown(${project.id}, ${task.id})">↓ Move Down</button>
+                                                <button onclick="deleteTask(${project.id}, ${task.id})">🗑️ Delete</button>
                                             </div>
                                         ` : ''}
                                     </div>
@@ -1001,19 +863,14 @@
             }).join('');
         }
 
-        // Close menu when clicking outside
         document.addEventListener('click', (e) => {
-            if (openMenuId !== null && !e.target.closest('.task-menu-btn')) {
+            if (!e.target.closest('.task-menu-btn') && !e.target.closest('.project-menu-btn')) {
                 openMenuId = null;
-                renderProjects();
-            }
-            if (openProjectMenuId !== null && !e.target.closest('.project-menu-btn')) {
                 openProjectMenuId = null;
                 renderProjects();
             }
         });
 
-        // Load projects on page load
         loadProjects();
     </script>
 </body>
